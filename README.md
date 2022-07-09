@@ -1,4 +1,4 @@
-![](https://javacord.org/img/javacord3_banner.png)
+![](https://raw.githubusercontent.com/easy-cord/Easycord/742251d2a47144ceff5070c07e42a83051244c8d/assets/vector/default-monochrome.svg)
 # Javacord [![Latest version](https://shields.io/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square)](https://github.com/Javacord/Javacord/releases/latest) [![Latest JavaDocs](https://shields.io/badge/JavaDoc-Latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.io/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
 
 An easy to use multithreaded library for creating Discord bots in Java.
@@ -23,12 +23,30 @@ public class MyFirstBot {
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
-        // Add a listener which answers with "Pong!" if someone writes "!ping"
-        api.addMessageCreateListener(event -> {
-            if (event.getMessageContent().equalsIgnoreCase("!ping")) {
-                event.getChannel().sendMessage("Pong!");
-            }
-        });
+        // Add a listener which answers with "Pong!" if someone use the application command "/ping"
+        
+        SlashCommand.with("news", "adds yourself into the group News").setDefaultEnabledForEveryone().createForGlobal().exceptionally(exception -> {
+            System.out.error("Cant create slash command");
+            System.out.error(exception.getMessage());
+            return null;
+        }).join();
+
+        api.addSlashCommandCreateListener(event -> {
+            SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
+            if (slashCommandInteraction.getCommandName().equals("ping")) {
+                long GatewayLatency = event.getApi().getLatestGatewayLatency().toMillis();
+                CompletableFuture<Void> RESTLatency = event.getApi().measureRestLatency().thenAccept(Time -> {
+                    EmbedBuilder finalPing = new EmbedBuilder()
+                            .setTitle("Ping")
+                            .addField("Bot Latency", "**" + GatewayLatency + "**" + "ms\n")
+                            .addField("REST Latency", "**" + Time.toMillis() + "**" + "ms\n")
+                            .setFooter(slashCommandInteraction.getUser().getDisplayName(slashCommandInteraction.getServer().orElse(null)), slashCommandInteraction.getUser().getAvatar())
+                            .setTimestamp(Instant.now())
+                            .addField("Current Time", "**" + new SimpleDateFormat("HH:mm:ss").format(System.currentTimeMillis()) + "**" + "\n");
+                    slashCommandInteraction.createImmediateResponder().addEmbed(finalPing).setFlags(MessageFlag.EPHEMERAL).respond();
+            });
+        }});
+
 
         // Print the invite url of your bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
@@ -37,7 +55,7 @@ public class MyFirstBot {
 }
 ```
 
-<img src="https://javacord.org/img/javacord-readme/ping-pong-white.gif"> 
+<img src=""> 
 
 More sophisticated examples can be found at the [end of the README](#-more-examples). 
 You can also check out the [example bot](https://github.com/Javacord/Example-Bot) for a fully functional bot.

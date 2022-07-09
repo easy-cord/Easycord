@@ -1,3 +1,3 @@
-rootProject.name = "javacord"
+rootProject.name = "easycord"
 
-include("javacord-api", "javacord-core")
+include("easycord-api", "easycord-core")

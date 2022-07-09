@@ -11,12 +11,12 @@ repositories {
 }
 
 dependencies {
-    api(project(":javacord-api"))
-    implementation(project(":javacord-core"))
+    api(project(":easycord-api"))
+    implementation(project(":easycord-core"))
 }
 
 allprojects {
-    group = "org.javacord"
+    group = "org.easycord"
 
     description = "An easy to use multithreaded library for creating Discord bots in Java"
 
@@ -32,7 +32,7 @@ task("generate") // We need to create the task so that the generation files can 
 val releaseVersion by extra(!version.toString().endsWith("-SNAPSHOT"))
 
 subprojects {
-    val shortName by extra(name.replace("javacord-", ""))
+    val shortName by extra(name.replace("easycord-", ""))
     description = "An easy to use multithreaded library for creating Discord bots in Java ($shortName)"
 }
 
@@ -55,7 +55,7 @@ configure<PublishingExtension> {
 
         publishing {
             publications {
-                create<MavenPublication>("javacord") {
+                create<MavenPublication>("easycord") {
                     pom {
                         name.set(rootProject.name.capitalize() + (if (project.parent != null) " (${project.ext.get("shortName")})" else ""))
                         description.set(project.description)
@@ -125,7 +125,7 @@ configure<PublishingExtension> {
             val signingKey = System.getenv("SIGNING_KEY")
             val signingPassword = System.getenv("SIGNING_PASSWORD")
             useInMemoryPgpKeys(signingKey, signingPassword)
-            sign(publishing.publications["javacord"])
+            sign(publishing.publications["easycord"])
         }
     }
 }
@@ -133,7 +133,7 @@ configure<PublishingExtension> {
 subprojects {
     publishing {
         publications {
-            named<MavenPublication>("javacord") {
+            named<MavenPublication>("easycord") {
                 from(components["java"])
             }
         }
@@ -142,7 +142,7 @@ subprojects {
 
 publishing {
     publications {
-        named<MavenPublication>("javacord") {
+        named<MavenPublication>("easycord") {
             // add the dependencies to the POM
             from(components["java"])
             // but do not try to publish the JAR
@@ -155,7 +155,7 @@ subprojects {
     tasks.register("configureJavadoc") {
         doLast {
             tasks.javadoc {
-                options.windowTitle = "Javacord $version (${project.ext.get("shortName")})"
+                options.windowTitle = "Easycord $version (${project.ext.get("shortName")})"
                 title = options.windowTitle
             }
         }

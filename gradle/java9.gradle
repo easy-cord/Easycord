@@ -9,6 +9,7 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver
+import jdk.jfr.internal.jfc.model.PrettyPrinter
 
 buildscript {
     repositories {
@@ -30,7 +31,7 @@ if (JavaVersion.current().java9Compatible) {
             destinationDirectory = file("$buildDir/classes/java9/main")
             sourceCompatibility = 9
             targetCompatibility = 9
-            options.compilerArgs << '--patch-module' << ("org.javacord.$shortName=${compileJava.destinationDirectory.get()}" as String)
+            options.compilerArgs << '--patch-module' << ("org.easycord.$shortName=${compileJava.destinationDirectory.get()}" as String)
             afterEvaluate {
                 // access SourceDirectorySet#asPath in afterEvaluate
                 // or projects get evaluated before all configuration is done
@@ -49,7 +50,7 @@ if (JavaVersion.current().java9Compatible) {
         }
     }
 
-    project(':javacord-api') {
+    project(':easycord-api') {
         task generateModuleInfo {
             ext.outputDirectory = "$buildDir/generated/module-info"
 
@@ -73,14 +74,14 @@ if (JavaVersion.current().java9Compatible) {
                         .setStorage(file("$outputDirectory/module-info.java").toPath())
 
                 def module = moduleInfoFile
-                        .setModule('org.javacord.api')
+                        .setModule('org.easycord.api')
                         .addSingleMemberAnnotation(SuppressWarnings, '"module"')
                         .addDirective('requires transitive java.desktop;')
-                        .addDirective('uses org.javacord.api.util.internal.DelegateFactoryDelegate;')
+                        .addDirective('uses org.easycord.api.util.internal.DelegateFactoryDelegate;')
 
                 sourceSets.main.allJava.matching {
-                    include 'org/javacord/api/**'
-                    exclude 'org/javacord/api/**/internal/**'
+                    include 'org/easycord/api/**'
+                    exclude 'org/easycord/api/**/internal/**'
                 }.collectMany {
                     JavaParser.parse(it).findAll PackageDeclaration
                 }.unique().each {
@@ -88,11 +89,11 @@ if (JavaVersion.current().java9Compatible) {
                 }
 
                 sourceSets.main.allJava.matching {
-                    include 'org/javacord/api/**/internal/**'
+                    include 'org/easycord/api/**/internal/**'
                 }.collectMany {
                     JavaParser.parse(it).findAll PackageDeclaration
                 }.unique().each {
-                    module.addDirective "exports $it.nameAsString to org.javacord.core;"
+                    module.addDirective "exports $it.nameAsString to org.easycord.core;"
                 }
 
                 moduleInfoFile.storage.ifPresent {
