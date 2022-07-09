@@ -25,8 +25,8 @@ public class MyFirstBot {
 
         // Add a listener which answers with "Pong!" if someone use the application command "/ping"
         
-        SlashCommand.with("news", "adds yourself into the group News").setDefaultEnabledForEveryone().createForGlobal().exceptionally(exception -> {
-            System.out.error("Cant create slash command");
+        SlashCommand.with("ping", "shows the latency in milliseconds of the bot").setDefaultEnabledForEveryone().createForGlobal().exceptionally(exception -> {
+            System.out.error("Can't create slash command");
             System.out.error(exception.getMessage());
             return null;
         }).join();
